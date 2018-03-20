@@ -16,8 +16,6 @@ What things you need to install the software and how to install them
 
 * PHP `7.1.x`
 	* CURL
-	* imagemagick
-* Laravel `5.4.22`
 * NVM
 * NodeJS 7.9.8
 	*  ```npm install lodash```
@@ -61,10 +59,6 @@ Explain what these tests test and why
 Give an example
 ```
 
-## Deployment
-
-See [Deployment Docs](./docs/deploy.md)
-
 ## Built With
 
 * [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
@@ -76,6 +70,16 @@ See [Deployment Docs](./docs/deploy.md)
 * Hat tip to anyone who's code was used
 * Inspiration
 * etc
+
+## Docs Index
+
+1. [Architecture](./architecture.md)
+2. [Deployment](./deploy.md)
+3. [Services](./services.md)
+4. MicroServices
+	1. API-1
+	2. API-2 
+5. Others
 
 
 ## Credits

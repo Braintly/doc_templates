@@ -5,7 +5,6 @@ Back to [Readme](../readme.md)
 
 ---
 
-# Architecture
 
 ## Credits
 Doc created by [@BraintlySoftwareBoutique](http://braint.ly) 
