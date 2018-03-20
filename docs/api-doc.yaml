@@ -1,0 +1,345 @@
+openapi: 3.0.0
+info:
+  description: ''
+  version: 1.0.0
+  title: Beer Control
+paths:
+  /brand:
+    get:
+      summary: Fetch all brands
+      description: ''
+      operationId: getBrand
+      security:
+        - CognitoBearer: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandsList'
+        '401':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CognitoForbidden'
+        '500':
+          description: Error
+  '/brand/{brandId}/locations':
+    get:
+      summary: Fetch all locations from a brand
+      description: ''
+      operationId: getLocationByBrand
+      parameters:
+        - name: brandId
+          in: path
+          description: ID of brand
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationsList'
+        '400':
+          description: Missing brandId or Invalid
+        '500':
+          description: Error
+  '/location/{locationId}/sensors':
+    get:
+      summary: Fetch all sensors by location
+      description: ''
+      operationId: getSensorsByLocation
+      parameters:
+        - name: locationId
+          in: path
+          description: ID of location
+          required: true
+          schema:
+            type: integer
+        - name: sensorType
+          in: query
+          description: Sensor Type Id
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorsList'
+        '400':
+          description: Missing brandId or Invalid
+        '500':
+          description: Error
+  /measurement:
+    post:
+      summary: Register a Measurement
+      operationId: createMeasurement
+      requestBody:
+        description: New mesurement
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMeasurement'
+      security:
+        - APIKeyHeader: []
+      responses:
+        '200':
+          description: >-
+            Success if new Measurements were created or a Measurement already
+            existed (in this case the existing entity is not modified)
+        '400':
+          description: Invalid Payload
+        '404':
+          description: Invalid Sensor
+        '500':
+          description: Error parsing Payload or Query error
+    get:
+      summary: Query Measurements
+      description: ''
+      operationId: queryMeasurements
+      parameters:
+        - name: g
+          in: query
+          description: Granularity
+          required: true
+          schema:
+            type: string
+            enum:
+              - brand
+              - sensor
+              - sensorType
+              - location
+              - year
+              - month
+              - day
+              - hour
+              - minute
+        - name: brand
+          in: query
+          description: ID of Brand
+          required: false
+          schema:
+            type: integer
+        - name: sensor
+          in: query
+          description: ID of Sensor
+          required: false
+          schema:
+            type: integer
+        - name: sensorType
+          in: query
+          description: ID of Sensor Type
+          required: false
+          schema:
+            type: integer
+        - name: location
+          in: query
+          description: ID of Location
+          required: false
+          schema:
+            type: integer
+        - name: year
+          in: query
+          description: Year
+          required: false
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: Month
+          required: false
+          schema:
+            type: integer
+        - name: day
+          in: query
+          description: Day
+          required: false
+          schema:
+            type: integer
+        - name: hour
+          in: query
+          description: Hour
+          required: false
+          schema:
+            type: integer
+        - name: Minute
+          in: query
+          description: Minute"
+          required: false
+          schema:
+            type: integer
+        - name: minDate
+          in: query
+          description: Min sensed date
+          required: false
+          schema:
+            type: string
+            format: 'YYYY-MM-DD HH:II:SS'
+        - name: maxDate
+          in: query
+          description: Max sensed date
+          required: false
+          schema:
+            type: string
+            format: 'YYYY-MM-DD HH:II:SS'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementsList'
+        '400':
+          description: Invalid Date filter/s
+        '500':
+          description: Error
+components:
+  securitySchemes:
+    CognitoBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    BrandsList:
+      type: object
+      properties:
+        brands:
+          type: array
+          items:
+            $ref: '#/components/schemas/Brand'
+    Brand:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              href:
+                type: string
+                description: Relative path to Locations
+              rel:
+                type: string
+                description: Related Entity ("location")
+              type:
+                type: string
+                description: HTTP Verb ("GET")
+    LocationsList:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              href:
+                type: string
+                description: Relative path to Sensors
+              rel:
+                type: string
+                description: Related Entity ("sensors)""
+              type:
+                type: string
+                description: HTTP Verb ("GET")
+    SensorsList:
+      type: object
+      properties:
+        sensors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sensor'
+    Sensor:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        adjustFactor:
+          type: number
+          format: float
+    NewMeasurement:
+      type: array
+      items:
+        type: object
+        properties:
+          sensorId:
+            description: ID of Sensor
+            type: integer
+          value:
+            description: Measured Value
+            type: number
+            format: float
+    MeasurementsList:
+      type: object
+      properties:
+        measurements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Measurement'
+    Measurement:
+      type: object
+      properties:
+        brandId:
+          type: integer
+          description: ID of Brand
+        locationId:
+          type: integer
+          description: ID of Location
+        sensorId:
+          type: integer
+          description: ID of Sensor
+        sensorTypeId:
+          type: integer
+          description: ID of Sensor Type
+        mear:
+          type: integer
+          description: Year
+        month:
+          type: integer
+          description: Month
+        day:
+          type: integer
+          description: Day
+        hour:
+          type: integer
+          description: Hour
+        minutes:
+          type: integer
+          description: Minutes
+        total:
+          type: number
+          format: float
+          description: Total Adjusted
+    CognitoForbidden:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Forbidden message
